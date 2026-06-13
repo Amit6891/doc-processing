@@ -67,6 +67,8 @@ Start the server from the root directory:
 
 ```bash
 uvicorn src.api_server:app --reload
+OR
+py -m uvicorn src.api_server:app --reload
 ```
 
 The API will be available at `http://127.0.0.1:8000`.
