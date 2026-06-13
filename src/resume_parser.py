@@ -5,7 +5,7 @@ from pathlib import Path
 from azure.core.credentials import AzureKeyCredential
 from azure.ai.documentintelligence import DocumentIntelligenceClient
 from azure.ai.documentintelligence.models import AnalyzeDocumentRequest
-from openai import AzureOpenAI
+from openai import OpenAI
 
 from src.config import (
     AZURE_OPENAI_ENDPOINT,
@@ -85,12 +85,7 @@ def parse_fields_with_openai(resume_text: str) -> dict:
     Sends extracted resume text to Azure OpenAI (via AI Foundry) and returns
     a dict with name, email, phone, location, top_skill.
     """
-    # client = OpenAI(api_key=AZURE_OPENAI_KEY, base_url=AZURE_OPENAI_ENDPOINT)
-    client = AzureOpenAI(
-        azure_endpoint=AZURE_OPENAI_ENDPOINT,
-        api_key=AZURE_OPENAI_KEY,
-        api_version="2024-12-01-preview",  # latest stable GA version
-    )
+    client = OpenAI(api_key=AZURE_OPENAI_KEY, base_url=AZURE_OPENAI_ENDPOINT)
 
     response = client.chat.completions.create(
         model=AZURE_OPENAI_DEPLOYMENT,
@@ -148,7 +143,7 @@ def parse_resume(file_path: str, fallback_on_error: bool = True) -> dict:
         fields = parse_fields_with_openai(raw_text)
     except Exception as ex:
         if fallback_on_error:
-            print(f"      ⚠ OpenAI call failed ({ex}), using regex fallback")
+            print(f"⚠ OpenAI call failed ({ex}), using regex fallback")
             fields = regex_fallback(raw_text)
         else:
             raise
